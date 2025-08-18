@@ -73,7 +73,6 @@ class ProfileScreen extends StatelessWidget {
 
   Widget _buildProfileCard(IconData icon, String title, String subtitle) {
     return Card(
-      // ignore: deprecated_member_use
       color: Colors.white.withOpacity(0.05),
       margin: EdgeInsets.only(bottom: 12.h),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.r)),

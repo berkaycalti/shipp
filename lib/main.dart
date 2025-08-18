@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:shipp/constants/colors.dart';
 import 'screens/auth/login_screen.dart';
 
 void main() {
@@ -16,6 +17,12 @@ class ShippApp extends StatelessWidget {
       minTextAdapt: true,
       builder: (_, __) => MaterialApp(
         debugShowCheckedModeBanner: false,
+        theme: ThemeData(
+          brightness: Brightness.dark,
+          scaffoldBackgroundColor: AppColors.background,
+          fontFamily: 'Clash Grotesk Variable',
+          useMaterial3: true,
+        ),
         home: const LoginScreen(),
       ),
     );
