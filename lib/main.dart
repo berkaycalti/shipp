@@ -7,11 +7,14 @@ import 'config/theme/app_theme.dart';
 import 'config/routes/app_router.dart';
 import 'shared/services/storage_service.dart';
 import 'core/utils/logger.dart';
+import 'firebase_options.dart';
 
 // Background message handler - must be top-level
 @pragma('vm:entry-point')
 Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  await Firebase.initializeApp();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   Logger.info('Background message received: ${message.messageId}');
 }
 
@@ -20,7 +23,9 @@ void main() async {
   
   // Initialize Firebase
   try {
-    await Firebase.initializeApp();
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
     Logger.info('Firebase initialized');
     
     // Set up background message handler
