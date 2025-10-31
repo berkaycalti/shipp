@@ -7,14 +7,30 @@ import '../../features/auth/screens/login_screen.dart';
 import '../../features/auth/screens/otp_verification_screen.dart';
 import '../../features/auth/screens/create_account_screen.dart';
 import '../../features/auth/screens/name_input_screen.dart';
+import '../../features/auth/screens/gender_selection_screen.dart';
+import '../../features/auth/screens/match_preference_screen.dart';
+import '../../features/auth/screens/birth_date_screen.dart';
+import '../../features/auth/screens/birth_time_screen.dart';
+import '../../features/auth/screens/birth_location_screen.dart';
+import '../../features/auth/screens/physical_attributes_screen.dart';
+import '../../features/auth/screens/looking_for_screen.dart';
+import '../../features/auth/screens/profile_photos_screen.dart';
+import '../../features/auth/screens/welcome_screen.dart';
 import '../../features/auth/screens/forgot_password_screen.dart';
 import '../../features/home/screens/home_screen.dart';
-import '../../features/home/screens/discover_screen.dart';
 import '../../features/home/screens/filter_screen.dart';
+import '../../features/home/screens/notifications_screen.dart';
 import '../../features/explore/screens/map_screen.dart';
 import '../../features/premium/screens/showcase_screen.dart';
+import '../../features/premium/screens/membership_screen.dart';
 import '../../features/messages/screens/matches_screen.dart';
+import '../../features/messages/screens/chat_screen.dart';
 import '../../features/profile/screens/profile_screen.dart';
+import '../../features/profile/screens/notification_settings_screen.dart';
+import '../../features/profile/screens/settings_screen.dart';
+import '../../features/profile/screens/terms_and_privacy_screen.dart';
+import '../../features/profile/screens/profile_settings_screen.dart';
+import '../../features/profile/screens/profile_detail_screen.dart';
 import '../../features/astrology/screens/astrology_journey_screen.dart';
 import '../../features/astrology/screens/add_profile_screen.dart';
 import '../../features/astrology/screens/astrology_result_screen.dart';
@@ -64,6 +80,51 @@ class AppRouter {
         builder: (context, state) => const NameInputScreen(),
       ),
       GoRoute(
+        path: AppRoutes.createAccountGender,
+        name: 'create-account-gender',
+        builder: (context, state) => const GenderSelectionScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.createAccountMatchPreference,
+        name: 'create-account-match-preference',
+        builder: (context, state) => const MatchPreferenceScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.createAccountBirthDate,
+        name: 'create-account-birth-date',
+        builder: (context, state) => const BirthDateScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.createAccountBirthTime,
+        name: 'create-account-birth-time',
+        builder: (context, state) => const BirthTimeScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.createAccountBirthLocation,
+        name: 'create-account-birth-location',
+        builder: (context, state) => const BirthLocationScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.createAccountPhysicalAttributes,
+        name: 'create-account-physical-attributes',
+        builder: (context, state) => const PhysicalAttributesScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.createAccountLookingFor,
+        name: 'create-account-looking-for',
+        builder: (context, state) => const LookingForScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.createAccountPhotos,
+        name: 'create-account-photos',
+        builder: (context, state) => const ProfilePhotosScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.createAccountWelcome,
+        name: 'create-account-welcome',
+        builder: (context, state) => const WelcomeScreen(),
+      ),
+      GoRoute(
         path: AppRoutes.forgotPassword,
         name: 'forgot-password',
         builder: (context, state) => const ForgotPasswordScreen(),
@@ -111,10 +172,7 @@ class AppRouter {
       GoRoute(
         path: AppRoutes.notifications,
         name: 'notifications',
-        builder: (context, state) {
-          // TODO: Implement NotificationsScreen
-          return const Scaffold(body: Center(child: Text('Notifications')));
-        },
+        builder: (context, state) => const NotificationsScreen(),
       ),
 
       // ========== Showcase Flow ==========
@@ -132,19 +190,18 @@ class AppRouter {
         path: AppRoutes.chat,
         name: 'chat',
         builder: (context, state) {
-          // TODO: Implement ChatScreen
-          return const Scaffold(body: Center(child: Text('Chat')));
+          final conversationId = state.uri.queryParameters['conversationId'];
+          final userId = state.uri.queryParameters['userId'];
+          final userName = state.uri.queryParameters['userName'];
+          final userAvatarUrl = state.uri.queryParameters['userAvatarUrl'];
+          return ChatScreen(
+            conversationId: conversationId,
+            userId: userId,
+            userName: userName,
+            userAvatarUrl: userAvatarUrl,
+          );
         },
       ),
-      GoRoute(
-        path: AppRoutes.voiceVideoCall,
-        name: 'voice-video-call',
-        builder: (context, state) {
-          // TODO: Implement VoiceVideoCallScreen
-          return const Scaffold(body: Center(child: Text('Voice/Video Call')));
-        },
-      ),
-
       // ========== Astrology Journey Flow ==========
       GoRoute(
         path: AppRoutes.astrologyJourney,
@@ -205,49 +262,40 @@ class AppRouter {
         path: AppRoutes.profileDetail,
         name: 'profile-detail',
         builder: (context, state) {
-          // TODO: Implement ProfileDetailScreen
-          return const Scaffold(body: Center(child: Text('Profile Detail')));
+          final userId = state.uri.queryParameters['userId'];
+          final userName = state.uri.queryParameters['userName'];
+          final userAvatarUrl = state.uri.queryParameters['userAvatarUrl'];
+          return ProfileDetailScreen(
+            userId: userId,
+            userName: userName,
+            userAvatarUrl: userAvatarUrl,
+          );
         },
       ),
       GoRoute(
         path: AppRoutes.settings,
         name: 'settings',
-        builder: (context, state) {
-          // TODO: Implement SettingsScreen
-          return const Scaffold(body: Center(child: Text('Settings')));
-        },
+        builder: (context, state) => const SettingsScreen(),
         routes: [
           GoRoute(
             path: 'profile',
             name: 'profile-settings',
-            builder: (context, state) {
-              // TODO: Implement ProfileSettingsScreen
-              return const Scaffold(body: Center(child: Text('Profile Settings')));
-            },
+            builder: (context, state) => const ProfileSettingsScreen(),
           ),
           GoRoute(
             path: 'notification',
             name: 'notification-settings',
-            builder: (context, state) {
-              // TODO: Implement NotificationSettingsScreen
-              return const Scaffold(body: Center(child: Text('Notification Settings')));
-            },
+            builder: (context, state) => const NotificationSettingsScreen(),
           ),
           GoRoute(
             path: 'membership',
             name: 'membership',
-            builder: (context, state) {
-              // TODO: Implement MembershipScreen
-              return const Scaffold(body: Center(child: Text('Membership')));
-            },
+            builder: (context, state) => const MembershipScreen(),
           ),
           GoRoute(
             path: 'terms-privacy',
             name: 'terms-privacy',
-            builder: (context, state) {
-              // TODO: Implement TermsAndPrivacyScreen
-              return const Scaffold(body: Center(child: Text('Terms & Privacy')));
-            },
+            builder: (context, state) => const TermsAndPrivacyScreen(),
           ),
         ],
       ),

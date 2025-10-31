@@ -1,63 +1,46 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../design/tokens/app_colors.dart';
-import '../../../design/tokens/app_typography.dart';
 import '../../../design/tokens/app_spacing.dart';
+import '../../../design/tokens/app_typography.dart';
 import '../../../shared/widgets/app_button.dart';
-import '../../../core/utils/validators.dart';
+import '../../../shared/widgets/app_date_picker.dart';
 import '../../../core/constants/app_routes.dart';
 
-/// Name Input Screen
-/// First step in account creation flow
-class NameInputScreen extends StatefulWidget {
-  const NameInputScreen({super.key});
+/// Birth Date Screen
+/// Step 4 in account creation flow
+class BirthDateScreen extends StatefulWidget {
+  const BirthDateScreen({super.key});
 
   @override
-  State<NameInputScreen> createState() => _NameInputScreenState();
+  State<BirthDateScreen> createState() => _BirthDateScreenState();
 }
 
-class _NameInputScreenState extends State<NameInputScreen> {
-  final _formKey = GlobalKey<FormState>();
-  final _nameController = TextEditingController();
-  bool _isLoading = false;
+class _BirthDateScreenState extends State<BirthDateScreen> {
+  DateTime? _selectedDate;
+  
+  // Progress: Step 4 out of 10 (approximately 40% = 162px / 327px)
+  final double _progress = 162 / 327;
 
-  // Progress: Step 1 out of 8 (approximately 12.5% = 40.88px / 327px)
-  final double _progress = 40.88 / 327;
-
-  @override
-  void dispose() {
-    _nameController.dispose();
-    super.dispose();
-  }
-
-  Future<void> _handleNext() async {
-    if (!_formKey.currentState!.validate()) {
-      return;
-    }
-
-    setState(() => _isLoading = true);
-
-    // TODO: Save name to account creation state/context
-    await Future.delayed(const Duration(milliseconds: 500));
-
-    if (mounted) {
-      setState(() => _isLoading = false);
-      // Navigate to next step in account creation flow
-      context.push(AppRoutes.createAccountGender);
-    }
+  void _handleNext() {
+    if (_selectedDate == null) return;
+    
+    // TODO: Save birth date to account creation state
+    context.push(AppRoutes.createAccountBirthTime);
   }
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final bgColor = isDark ? AppDarkColors.background : AppColors.background;
+    final now = DateTime.now();
 
     return Scaffold(
       backgroundColor: bgColor,
       body: SafeArea(
         child: Column(
           children: [
-            // Top section with back button, progress bar, and title
+            // Top section
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
               child: Column(
@@ -116,7 +99,7 @@ class _NameInputScreenState extends State<NameInputScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Adını Gir',
+                          'Doğum Tarihini Gir',
                           style: AppTypography.h3.copyWith(
                             color: isDark ? AppDarkColors.textPrimary : AppColors.textPrimary,
                             fontWeight: AppTypography.medium,
@@ -126,7 +109,7 @@ class _NameInputScreenState extends State<NameInputScreen> {
                         SizedBox(
                           width: double.infinity,
                           child: Text(
-                            'Bu isim profilinde görünecek ve sonradan değiştirilemez.',
+                            'Yaşını ve burcunu belirlemek için doğum gününü bizimle paylaş.',
                             style: AppTypography.bodyMedium.copyWith(
                               color: isDark ? AppDarkColors.textSecondary : AppColors.textSecondary,
                             ),
@@ -141,45 +124,20 @@ class _NameInputScreenState extends State<NameInputScreen> {
             
             const SizedBox(height: AppSpacing.xl * 2),
             
-            // Form section
+            // Date picker
             Expanded(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
-                child: Form(
-                  key: _formKey,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Name input
-                      Container(
-                        width: double.infinity,
-                        height: 56,
-                        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
-                        decoration: BoxDecoration(
-                          border: Border.all(
-                            color: isDark ? AppDarkColors.border : AppColors.border,
-                            width: 1,
-                          ),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: TextFormField(
-                          controller: _nameController,
-                          style: AppTypography.bodyMedium.copyWith(
-                            color: isDark ? AppDarkColors.textPrimary : AppColors.textPrimary,
-                          ),
-                          decoration: InputDecoration(
-                            hintText: 'İsmin',
-                            hintStyle: AppTypography.bodyMedium.copyWith(
-                              color: isDark ? AppDarkColors.textTertiary : AppColors.textTertiary,
-                            ),
-                            border: InputBorder.none,
-                            contentPadding: EdgeInsets.zero,
-                          ),
-                          validator: Validators.name,
-                        ),
-                      ),
-                    ],
-                  ),
+                child: AppDatePicker(
+                  selectedDate: _selectedDate,
+                  onDateSelected: (date) {
+                    setState(() {
+                      _selectedDate = date;
+                    });
+                  },
+                  firstDate: DateTime(1900),
+                  lastDate: now.subtract(const Duration(days: 365 * 18)), // Minimum 18 years old
+                  initialDate: now.subtract(const Duration(days: 365 * 25)),
                 ),
               ),
             ),
@@ -189,9 +147,8 @@ class _NameInputScreenState extends State<NameInputScreen> {
               padding: const EdgeInsets.all(AppSpacing.lg),
               child: AppButton(
                 label: 'İlerle',
-                onPressed: _isLoading ? null : _handleNext,
+                onPressed: _selectedDate != null ? _handleNext : null,
                 fullWidth: true,
-                isLoading: _isLoading,
               ),
             ),
           ],

@@ -1,50 +1,38 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../design/tokens/app_colors.dart';
-import '../../../design/tokens/app_typography.dart';
 import '../../../design/tokens/app_spacing.dart';
+import '../../../design/tokens/app_typography.dart';
+import '../../../design/tokens/app_border_radius.dart';
 import '../../../shared/widgets/app_button.dart';
-import '../../../core/utils/validators.dart';
 import '../../../core/constants/app_routes.dart';
 
-/// Name Input Screen
-/// First step in account creation flow
-class NameInputScreen extends StatefulWidget {
-  const NameInputScreen({super.key});
+/// Gender Selection Screen
+/// Step 2 in account creation flow
+class GenderSelectionScreen extends StatefulWidget {
+  const GenderSelectionScreen({super.key});
 
   @override
-  State<NameInputScreen> createState() => _NameInputScreenState();
+  State<GenderSelectionScreen> createState() => _GenderSelectionScreenState();
 }
 
-class _NameInputScreenState extends State<NameInputScreen> {
-  final _formKey = GlobalKey<FormState>();
-  final _nameController = TextEditingController();
-  bool _isLoading = false;
+class _GenderSelectionScreenState extends State<GenderSelectionScreen> {
+  String? _selectedGender;
+  
+  // Progress: Step 2 out of 10 (approximately 20% = 82px / 327px)
+  final double _progress = 82 / 327;
 
-  // Progress: Step 1 out of 8 (approximately 12.5% = 40.88px / 327px)
-  final double _progress = 40.88 / 327;
+  final List<Map<String, dynamic>> _genders = [
+    {'value': 'male', 'label': 'Erkek'},
+    {'value': 'female', 'label': 'Kadın'},
+    {'value': 'other', 'label': 'Diğer'},
+  ];
 
-  @override
-  void dispose() {
-    _nameController.dispose();
-    super.dispose();
-  }
-
-  Future<void> _handleNext() async {
-    if (!_formKey.currentState!.validate()) {
-      return;
-    }
-
-    setState(() => _isLoading = true);
-
-    // TODO: Save name to account creation state/context
-    await Future.delayed(const Duration(milliseconds: 500));
-
-    if (mounted) {
-      setState(() => _isLoading = false);
-      // Navigate to next step in account creation flow
-      context.push(AppRoutes.createAccountGender);
-    }
+  void _handleNext() {
+    if (_selectedGender == null) return;
+    
+    // TODO: Save gender to account creation state
+    context.push(AppRoutes.createAccountMatchPreference);
   }
 
   @override
@@ -57,7 +45,7 @@ class _NameInputScreenState extends State<NameInputScreen> {
       body: SafeArea(
         child: Column(
           children: [
-            // Top section with back button, progress bar, and title
+            // Top section
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
               child: Column(
@@ -116,7 +104,7 @@ class _NameInputScreenState extends State<NameInputScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Adını Gir',
+                          'Cinsiyeti Seç',
                           style: AppTypography.h3.copyWith(
                             color: isDark ? AppDarkColors.textPrimary : AppColors.textPrimary,
                             fontWeight: AppTypography.medium,
@@ -126,7 +114,7 @@ class _NameInputScreenState extends State<NameInputScreen> {
                         SizedBox(
                           width: double.infinity,
                           child: Text(
-                            'Bu isim profilinde görünecek ve sonradan değiştirilemez.',
+                            'Kendini nasıl tanımladığını bilmek, sana en uygun eşleşmeleri sunmamıza yardımcı olur.',
                             style: AppTypography.bodyMedium.copyWith(
                               color: isDark ? AppDarkColors.textSecondary : AppColors.textSecondary,
                             ),
@@ -141,44 +129,17 @@ class _NameInputScreenState extends State<NameInputScreen> {
             
             const SizedBox(height: AppSpacing.xl * 2),
             
-            // Form section
+            // Gender options
             Expanded(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
-                child: Form(
-                  key: _formKey,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Name input
-                      Container(
-                        width: double.infinity,
-                        height: 56,
-                        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
-                        decoration: BoxDecoration(
-                          border: Border.all(
-                            color: isDark ? AppDarkColors.border : AppColors.border,
-                            width: 1,
-                          ),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: TextFormField(
-                          controller: _nameController,
-                          style: AppTypography.bodyMedium.copyWith(
-                            color: isDark ? AppDarkColors.textPrimary : AppColors.textPrimary,
-                          ),
-                          decoration: InputDecoration(
-                            hintText: 'İsmin',
-                            hintStyle: AppTypography.bodyMedium.copyWith(
-                              color: isDark ? AppDarkColors.textTertiary : AppColors.textTertiary,
-                            ),
-                            border: InputBorder.none,
-                            contentPadding: EdgeInsets.zero,
-                          ),
-                          validator: Validators.name,
-                        ),
-                      ),
-                    ],
+                child: Column(
+                  children: List.generate(
+                    _genders.length,
+                    (index) => Padding(
+                      padding: const EdgeInsets.only(bottom: AppSpacing.md),
+                      child: _buildGenderOption(_genders[index]),
+                    ),
                   ),
                 ),
               ),
@@ -189,10 +150,87 @@ class _NameInputScreenState extends State<NameInputScreen> {
               padding: const EdgeInsets.all(AppSpacing.lg),
               child: AppButton(
                 label: 'İlerle',
-                onPressed: _isLoading ? null : _handleNext,
+                onPressed: _selectedGender != null ? _handleNext : null,
                 fullWidth: true,
-                isLoading: _isLoading,
               ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildGenderOption(Map<String, dynamic> gender) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isSelected = _selectedGender == gender['value'];
+    final borderColor = isSelected
+        ? AppColors.primary
+        : (isDark ? AppDarkColors.border : AppColors.border);
+    final bgColor = isDark ? AppDarkColors.surface : AppColors.surface;
+    final textColor = isSelected
+        ? AppColors.textPrimary
+        : (isDark ? AppDarkColors.textPrimary.withValues(alpha: 0.6) : AppColors.textPrimary.withValues(alpha: 0.6));
+    final fontWeight = isSelected ? FontWeight.w500 : FontWeight.w400;
+
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          _selectedGender = gender['value'];
+        });
+      },
+      child: Container(
+        width: double.infinity,
+        height: 50,
+        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+        decoration: BoxDecoration(
+          color: bgColor,
+          border: Border.all(
+            color: borderColor,
+            width: 1,
+          ),
+          borderRadius: AppBorderRadius.medium,
+        ),
+        child: Row(
+          children: [
+            // Icon placeholder (can be replaced with actual icon)
+            Container(
+              width: 20,
+              height: 20,
+              decoration: BoxDecoration(
+                color: isSelected
+                    ? AppColors.primary
+                    : (isDark ? AppDarkColors.border : AppColors.border),
+                borderRadius: BorderRadius.circular(4),
+              ),
+            ),
+            const SizedBox(width: AppSpacing.sm),
+            Text(
+              gender['label'],
+              style: AppTypography.bodyMedium.copyWith(
+                color: textColor,
+                fontWeight: fontWeight,
+              ),
+            ),
+            const Spacer(),
+            // Radio button
+            Container(
+              width: 16,
+              height: 16,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: isSelected ? AppColors.primary : borderColor,
+                  width: 1,
+                ),
+                color: isSelected ? AppColors.primary : Colors.transparent,
+              ),
+              child: isSelected
+                  ? const Icon(
+                      Icons.check,
+                      size: 10,
+                      color: AppColors.textOnDark,
+                    )
+                  : null,
             ),
           ],
         ),

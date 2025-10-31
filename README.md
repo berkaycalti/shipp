@@ -74,6 +74,8 @@ lib/
 └── shared/          # Shared widgets, services
 ```
 
+> 📚 **Detaylı proje yapısı için:** [guide/PROJECT_STRUCTURE.md](./guide/PROJECT_STRUCTURE.md)
+
 ## 🔐 Environment Variables
 
 `.env` dosyasında şu değişkenler tanımlı olmalıdır:
@@ -90,7 +92,20 @@ FIREBASE_API_KEY=your_firebase_api_key
 - ⚠️ Web (planlanıyor)
 - ⚠️ macOS (planlanıyor)
 
+## 📚 Dokümantasyon
+
+Tüm detaylı dokümantasyon `guide/` klasöründe bulunmaktadır:
+
+- **[guide/TASKS.md](./guide/TASKS.md)** - 📋 Ana iş listesi ve ilerleme durumu
+- **[guide/PROJECT_STRUCTURE.md](./guide/PROJECT_STRUCTURE.md)** - 📁 Proje yapısı ve dosya açıklamaları
+- **[guide/DEVELOPMENT_NOTES.md](./guide/DEVELOPMENT_NOTES.md)** - 🔧 Geliştirme notları ve teknik detaylar
+- **[guide/README.md](./guide/README.md)** - 📚 Dokümantasyon indeksi
+
+> 💡 **Hızlı başlangıç:** [guide/TASKS.md](./guide/TASKS.md) dosyasından projenin mevcut durumunu görebilirsiniz.
+
 ## 🤝 Katkıda Bulunma
+
+Katkıda bulunma rehberi için: [CONTRIBUTING.md](./CONTRIBUTING.md)
 
 1. Fork edin
 2. Feature branch oluşturun (`git checkout -b feature/AmazingFeature`)

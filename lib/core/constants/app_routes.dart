@@ -10,6 +10,15 @@ class AppRoutes {
   static const String otpVerification = '/otp-verification';
   static const String createAccount = '/create-account';
   static const String createAccountName = '/create-account/name';
+  static const String createAccountGender = '/create-account/gender';
+  static const String createAccountMatchPreference = '/create-account/match-preference';
+  static const String createAccountBirthDate = '/create-account/birth-date';
+  static const String createAccountBirthTime = '/create-account/birth-time';
+  static const String createAccountBirthLocation = '/create-account/birth-location';
+  static const String createAccountPhysicalAttributes = '/create-account/physical-attributes';
+  static const String createAccountLookingFor = '/create-account/looking-for';
+  static const String createAccountPhotos = '/create-account/photos';
+  static const String createAccountWelcome = '/create-account/welcome';
   static const String forgotPassword = '/forgot-password';
 
   // ========== Main Navigation (Bottom Nav Bar) ==========
@@ -28,7 +37,6 @@ class AppRoutes {
 
   // ========== Matches/Chats Flow ==========
   static const String chat = '/chat';
-  static const String voiceVideoCall = '/voice-video-call';
 
   // ========== Profile Flow ==========
   static const String profileDetail = '/profile-detail';
@@ -63,7 +71,6 @@ class AppRoutes {
     notifications,
     paymentSteps,
     chat,
-    voiceVideoCall,
     profileDetail,
     settings,
     profileSettings,

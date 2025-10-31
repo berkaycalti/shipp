@@ -1,50 +1,33 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../design/tokens/app_colors.dart';
-import '../../../design/tokens/app_typography.dart';
 import '../../../design/tokens/app_spacing.dart';
+import '../../../design/tokens/app_typography.dart';
+import '../../../design/tokens/app_border_radius.dart';
 import '../../../shared/widgets/app_button.dart';
-import '../../../core/utils/validators.dart';
+import '../../../shared/widgets/app_time_picker.dart';
 import '../../../core/constants/app_routes.dart';
 
-/// Name Input Screen
-/// First step in account creation flow
-class NameInputScreen extends StatefulWidget {
-  const NameInputScreen({super.key});
+/// Birth Time Screen
+/// Step 5 in account creation flow
+class BirthTimeScreen extends StatefulWidget {
+  const BirthTimeScreen({super.key});
 
   @override
-  State<NameInputScreen> createState() => _NameInputScreenState();
+  State<BirthTimeScreen> createState() => _BirthTimeScreenState();
 }
 
-class _NameInputScreenState extends State<NameInputScreen> {
-  final _formKey = GlobalKey<FormState>();
-  final _nameController = TextEditingController();
-  bool _isLoading = false;
+class _BirthTimeScreenState extends State<BirthTimeScreen> {
+  TimeOfDay? _selectedTime;
+  bool _unknownTime = false;
+  
+  // Progress: Step 5 out of 10 (approximately 50% = 215px / 327px)
+  final double _progress = 215 / 327;
 
-  // Progress: Step 1 out of 8 (approximately 12.5% = 40.88px / 327px)
-  final double _progress = 40.88 / 327;
-
-  @override
-  void dispose() {
-    _nameController.dispose();
-    super.dispose();
-  }
-
-  Future<void> _handleNext() async {
-    if (!_formKey.currentState!.validate()) {
-      return;
-    }
-
-    setState(() => _isLoading = true);
-
-    // TODO: Save name to account creation state/context
-    await Future.delayed(const Duration(milliseconds: 500));
-
-    if (mounted) {
-      setState(() => _isLoading = false);
-      // Navigate to next step in account creation flow
-      context.push(AppRoutes.createAccountGender);
-    }
+  void _handleNext() {
+    // If unknown, use 12:00 as default
+    // TODO: Save birth time to account creation state
+    context.push(AppRoutes.createAccountBirthLocation);
   }
 
   @override
@@ -57,7 +40,7 @@ class _NameInputScreenState extends State<NameInputScreen> {
       body: SafeArea(
         child: Column(
           children: [
-            // Top section with back button, progress bar, and title
+            // Top section
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
               child: Column(
@@ -116,7 +99,7 @@ class _NameInputScreenState extends State<NameInputScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Adını Gir',
+                          'Doğum Saatini Gir',
                           style: AppTypography.h3.copyWith(
                             color: isDark ? AppDarkColors.textPrimary : AppColors.textPrimary,
                             fontWeight: AppTypography.medium,
@@ -126,7 +109,7 @@ class _NameInputScreenState extends State<NameInputScreen> {
                         SizedBox(
                           width: double.infinity,
                           child: Text(
-                            'Bu isim profilinde görünecek ve sonradan değiştirilemez.',
+                            'Daha doğru astrolojik eşleşmeler için doğum saatini belirtmen harika olur!',
                             style: AppTypography.bodyMedium.copyWith(
                               color: isDark ? AppDarkColors.textSecondary : AppColors.textSecondary,
                             ),
@@ -141,45 +124,90 @@ class _NameInputScreenState extends State<NameInputScreen> {
             
             const SizedBox(height: AppSpacing.xl * 2),
             
-            // Form section
+            // Time picker
             Expanded(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
-                child: Form(
-                  key: _formKey,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Name input
-                      Container(
+                child: Column(
+                  children: [
+                    AppTimePicker(
+                      selectedTime: _selectedTime,
+                      onTimeSelected: (time) {
+                        setState(() {
+                          _selectedTime = time;
+                          _unknownTime = false;
+                        });
+                      },
+                    ),
+                    const SizedBox(height: AppSpacing.xl),
+                    // Unknown time option
+                    GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _unknownTime = !_unknownTime;
+                          if (_unknownTime) {
+                            _selectedTime = null;
+                          }
+                        });
+                      },
+                      child: Container(
                         width: double.infinity,
-                        height: 56,
-                        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+                        padding: const EdgeInsets.all(AppSpacing.md),
                         decoration: BoxDecoration(
+                          color: isDark ? AppDarkColors.surface : AppColors.surface,
                           border: Border.all(
                             color: isDark ? AppDarkColors.border : AppColors.border,
                             width: 1,
                           ),
-                          borderRadius: BorderRadius.circular(8),
+                          borderRadius: AppBorderRadius.medium,
                         ),
-                        child: TextFormField(
-                          controller: _nameController,
-                          style: AppTypography.bodyMedium.copyWith(
-                            color: isDark ? AppDarkColors.textPrimary : AppColors.textPrimary,
-                          ),
-                          decoration: InputDecoration(
-                            hintText: 'İsmin',
-                            hintStyle: AppTypography.bodyMedium.copyWith(
-                              color: isDark ? AppDarkColors.textTertiary : AppColors.textTertiary,
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Doğum saatimi bilmiyorum.',
+                                    style: AppTypography.bodyMedium.copyWith(
+                                      color: isDark ? AppDarkColors.textPrimary : AppColors.textPrimary,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    '(saat 12.00 baz alınacaktır)',
+                                    style: AppTypography.caption.copyWith(
+                                      color: AppColors.textSecondary,
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
-                            border: InputBorder.none,
-                            contentPadding: EdgeInsets.zero,
-                          ),
-                          validator: Validators.name,
+                            Container(
+                              width: 16,
+                              height: 16,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                  color: _unknownTime ? AppColors.primary : AppColors.border,
+                                  width: 1,
+                                ),
+                                color: _unknownTime ? AppColors.primary : Colors.transparent,
+                              ),
+                              child: _unknownTime
+                                  ? const Icon(
+                                      Icons.check,
+                                      size: 10,
+                                      color: AppColors.textOnDark,
+                                    )
+                                  : null,
+                            ),
+                          ],
                         ),
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
             ),
@@ -189,9 +217,8 @@ class _NameInputScreenState extends State<NameInputScreen> {
               padding: const EdgeInsets.all(AppSpacing.lg),
               child: AppButton(
                 label: 'İlerle',
-                onPressed: _isLoading ? null : _handleNext,
+                onPressed: (_selectedTime != null || _unknownTime) ? _handleNext : null,
                 fullWidth: true,
-                isLoading: _isLoading,
               ),
             ),
           ],
